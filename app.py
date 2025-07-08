@@ -21,12 +21,20 @@ def sync():
             port=DB_PORT
         )
         cur = conn.cursor()
-        cur.execute("SELECT ref, cantidad FROM inventario")
+        # ✅ Usamos ref, color, cantidad
+        cur.execute("SELECT ref, color, cantidad FROM inventario")
         rows = cur.fetchall()
         cur.close()
         conn.close()
 
-        data = [{"sku": row[0], "cantidad": row[1]} for row in rows]
+        # ✅ Construimos el SKU como REF-COLOR (sin espacios, todo mayúscula)
+        data = [
+            {
+                "sku": f"{row[0]}-{row[1]}".upper().replace(" ", ""),
+                "cantidad": row[2]
+            }
+            for row in rows
+        ]
         return jsonify(data)
 
     except Exception as e:
