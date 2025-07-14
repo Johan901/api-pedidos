@@ -6,6 +6,9 @@ import threading
 import time
 import requests
 
+from crear_productos import crear_productos_nuevos  #Importamos el nuevo módulo
+
+
 app = Flask(__name__)
 
 # Configuración desde variables de entorno
@@ -58,6 +61,7 @@ def sync_wordpress_stock():
 
 def scheduler_loop():
     schedule.every(1).minutes.do(sync_wordpress_stock)
+    schedule.every(1).minutes.do(crear_productos_nuevos)       # cron de productos nuevos
     while True:
         schedule.run_pending()
         time.sleep(1)
