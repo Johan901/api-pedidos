@@ -5,6 +5,8 @@ import schedule
 import threading
 import time
 import requests
+from flask import request 
+
 
 from crear_productos import crear_productos_nuevos  #Importamos el nuevo módulo
 from actualizar_productos import actualizar_productos_existentes
@@ -69,9 +71,13 @@ def scheduler_loop():
 
 @app.route("/actualizar-productos", methods=["GET"])
 def actualizar_productos():
-    from actualizar_productos import actualizar_productos_existentes
-    actualizar_productos_existentes()
-    return "✅ Productos actualizados en WooCommerce desde BD"
+    try:
+        offset = int(request.args.get("offset", 0))
+        from actualizar_productos import actualizar_productos_existentes
+        resultado = actualizar_productos_existentes(offset=offset)
+        return resultado
+    except Exception as e:
+        return f"❌ Error procesando solicitud: {str(e)}", 500
 
 # Lanzar hilo de sincronización al iniciar
 threading.Thread(target=scheduler_loop, daemon=True).start()
